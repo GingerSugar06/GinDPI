@@ -124,7 +124,8 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           _Row(
             'Windows ile birlikte başlat',
-            'Bilgisayar açılınca tepsiye küçülerek başlar.',
+            'Bilgisayar açılınca GinDPI sistem tepsisinde sessizce başlar ve kendiliğinden bağlanır; '
+                'Discord için elle bir şey yapmanız gerekmez.',
             trailing: GSwitch(value: s.launchAtStartup, onChanged: c.setLaunchAtStartup),
           ),
           _Row(
@@ -179,7 +180,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ]),
         const SizedBox(height: 22),
-        const Text('GinDPI · sürücü yok, yönetici izni gerekmez · yalnızca seçili siteleri etkiler',
+        const Text('GinDPI · sürücü yüklemez · yalnızca seçili siteleri etkiler',
             style: TextStyle(color: P.faint, fontSize: 12)),
       ]),
     );

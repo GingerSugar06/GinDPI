@@ -19,6 +19,10 @@ Future<void> main(List<String> args) async {
     await WinSystem.setLaunchAtStartup(false);
     exit(0);
   }
+  // Kurulum sihirbazı çağırır: başlangıç görevini uygulamanın kendi tanımıyla kur.
+  if (args.contains('--startup-on')) {
+    exit(await WinSystem.setLaunchAtStartup(true) ? 0 : 1);
+  }
 
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
@@ -53,7 +57,8 @@ Future<void> main(List<String> args) async {
   controller.setWindowVisible(!startHidden);
 
   runApp(GinApp(controller: controller));
-  if (settings.autoConnect || startHidden && settings.autoConnect) controller.connect();
+  // Windows açılışında (--minimized) tepsiye gizli başlar ve elle bağlanmaya gerek kalmadan çalışır.
+  if (settings.autoConnect || startHidden) controller.connect();
 }
 
 class GinApp extends StatefulWidget {

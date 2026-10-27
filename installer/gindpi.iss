@@ -30,7 +30,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Masaüstü kısayolu oluştur"; GroupDescription: "Ek görevler:"
-Name: "autostart"; Description: "Windows ile birlikte başlat (tepsiye küçülerek)"; GroupDescription: "Ek görevler:"; Flags: unchecked
+Name: "autostart"; Description: "Windows ile birlikte başlat (tepsiye küçülerek)"; GroupDescription: "Ek görevler:"
 
 [Files]
 Source: "..\dist\GinDPI\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
@@ -41,7 +41,8 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\gindpi.exe"; Tasks: desktopic
 
 [Run]
 ; Yönetici gerektiren uygulama Run anahtarıyla sessiz açılamaz: en yüksek yetkili zamanlanmış görev.
-Filename: "schtasks.exe"; Parameters: "/Create /F /TN GinDPI /SC ONLOGON /RL HIGHEST /TR ""\""{app}\gindpi.exe\"" --minimized"""; Flags: runhidden; Tasks: autostart
+; Görevin tanımı uygulamanın kendisinde (pilde de çalışır, süre sınırı yok).
+Filename: "{app}\gindpi.exe"; Parameters: "--startup-on"; Flags: runhidden waituntilterminated; Tasks: autostart
 Filename: "{app}\gindpi.exe"; Description: "{#AppName}'ı şimdi başlat"; Flags: shellexec nowait postinstall skipifsilent
 
 [UninstallRun]

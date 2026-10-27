@@ -138,16 +138,25 @@ class WinSystem {
 
   /// Yönetici gerektiren uygulamalar Run anahtarıyla sessizce açılamaz; en yüksek
   /// yetkili zamanlanmış görev kullanılır (oturum açılışında, onay sormadan).
-  static Future<void> setLaunchAtStartup(bool on) async {
+  /// `schtasks /Create` varsayılanları pilde başlatmaz ve 72 saat sonra süreci
+  /// öldürür; bu yüzden görev PowerShell ile bu kısıtlar kapalı kurulur.
+  static Future<bool> setLaunchAtStartup(bool on) async {
     await Process.run('reg', ['delete', _run, '/v', 'GinDPI', '/f']); // eski sürümden kalan
-    if (on) {
-      await Process.run('schtasks', [
-        '/Create', '/F', '/TN', 'GinDPI', '/SC', 'ONLOGON', '/RL', 'HIGHEST',
-        '/TR', '"${Platform.resolvedExecutable}" --minimized',
-      ]);
-    } else {
+    if (!on) {
       await Process.run('schtasks', ['/Delete', '/F', '/TN', 'GinDPI']);
+      return true;
     }
+    final exe = Platform.resolvedExecutable.replaceAll("'", "''");
+    return runAdmin('''
+\$ErrorActionPreference = 'Stop'
+\$me = [Security.Principal.WindowsIdentity]::GetCurrent().Name
+\$act = New-ScheduledTaskAction -Execute '$exe' -Argument '--minimized'
+\$trg = New-ScheduledTaskTrigger -AtLogOn -User \$me
+\$trg.Delay = 'PT10S'
+\$prn = New-ScheduledTaskPrincipal -UserId \$me -LogonType Interactive -RunLevel Highest
+\$set = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew
+Register-ScheduledTask -TaskName 'GinDPI' -Action \$act -Trigger \$trg -Principal \$prn -Settings \$set -Force | Out-Null
+''');
   }
 
   // --------------------------------------------------- Yönetici gerektirenler

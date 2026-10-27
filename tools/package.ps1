@@ -28,7 +28,8 @@ GinDPI $version
 
 Kurulum gerektirmeyen sürüm: klasörü istediğiniz yere çıkarın, gindpi.exe'yi çalıştırın.
 Uygulama yönetici olarak açılır (tek onay). Sürücü yüklemez.
-Kaldırmak için önce uygulamadan çıkın (tepsi simgesi > Çıkış), sonra klasörü silin.
+Varsayılan olarak Windows ile birlikte tepsiye küçülerek başlar ve kendiliğinden bağlanır.
+Kaldırmak için önce Ayarlar'dan "Windows ile birlikte başlat"ı kapatın, uygulamadan çıkın (tepsi simgesi > Çıkış), sonra klasörü silin.
 "@ | Set-Content (Join-Path $stage 'BENI-OKU.txt') -Encoding UTF8
 
 Compress-Archive -Path $stage -DestinationPath (Join-Path $dist "GinDPI-$version-portable.zip") -CompressionLevel Optimal

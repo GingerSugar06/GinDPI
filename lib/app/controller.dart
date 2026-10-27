@@ -92,6 +92,9 @@ class AppController extends ChangeNotifier {
     if (settings.pacApplied) await WinSystem.restorePac(settings);
     if (elevated && await WinSystem.nrptInstalled()) await WinSystem.removeNrpt();
     await _spawnEngine();
+    // Varsayılan olarak Windows ile başlar: görev ilk açılışta kurulur, klasör
+    // taşındıysa (taşınabilir sürüm) yeni yola güncellenir. Beklenmez.
+    if (settings.launchAtStartup && elevated) unawaited(WinSystem.setLaunchAtStartup(true));
     notifyListeners();
   }
 
@@ -314,8 +317,12 @@ class AppController extends ChangeNotifier {
   }
 
   Future<void> setLaunchAtStartup(bool on) async {
-    settings.launchAtStartup = on;
-    await WinSystem.setLaunchAtStartup(on);
+    final ok = await WinSystem.setLaunchAtStartup(on);
+    if (ok) {
+      settings.launchAtStartup = on;
+    } else {
+      _addLog('warn', 'Başlangıç görevi ayarlanamadı (yönetici onayı verilmedi).');
+    }
     changed(restartEngine: false);
   }
 
@@ -347,7 +354,8 @@ class AppController extends ChangeNotifier {
     _tuneWait = Completer<void>();
     _engine!.send({'cmd': 'autotune', 'config': engineConfig.toMap()});
     await _tuneWait!.future;
-    settings.tuned = true;
+    // Ağ henüz hazır değilken (açılışta) hiçbir şey geçmez; bunu "ayarlandı" sayma.
+    settings.tuned = tune.values.any((t) => t.ok) || tuneBaselineOk == true;
     if (apply && tuneBest != null) {
       settings.strategy = tuneBest!;
       _addLog('info', 'En iyi yöntem seçildi: ${_strategyName(tuneBest!)}');

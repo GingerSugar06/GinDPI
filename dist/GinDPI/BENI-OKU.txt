@@ -1,5 +1,0 @@
-﻿GinDPI 1.0.0
-
-Kurulum gerektirmeyen sürüm: klasörü istediğiniz yere çıkarın, gindpi.exe'yi çalıştırın.
-Uygulama yönetici olarak açılır (tek onay). Sürücü yüklemez.
-Kaldırmak için önce uygulamadan çıkın (tepsi simgesi > Çıkış), sonra klasörü silin.
